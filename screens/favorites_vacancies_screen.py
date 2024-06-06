@@ -31,6 +31,12 @@ class FavoritesVacanciesScreen(Screen):
                 'Отобразить список вакансий с зрплатой выше средней',
                 self.context
             ),
+            ShowVacanciesByKeywordCommand(
+                'по слову',
+                'По слову',
+                'Отобразить список вакансий по ключевому слову',
+                self.context
+            ),
             BackCommand(
                 'назад',
                 'Назад',
@@ -78,4 +84,12 @@ class ShowVacanciesWithHigherSalaryCommand(Command):
 
     async def execute(self, user_input: str) -> Screen:
         Table.show_vacancies(Vacancies._get_vacancies_with_higher_salary())
+        return FavoritesVacanciesScreen()
+
+
+class ShowVacanciesByKeywordCommand(Command):
+
+    async def execute(self, user_input: str) -> Screen:
+        user_input = input('Введите ключевое слово для поиска: ')
+        Table.show_vacancies(Vacancies._get_vacancies_with_keyword(user_input))
         return FavoritesVacanciesScreen()

@@ -42,6 +42,11 @@ class Vacancies(Model):
         }
 
     @classmethod
+    def _get_vacancies_with_keyword(cls, keyword):
+        vacancies = cls.all()
+        return [vacancy for vacancy in vacancies if keyword.strip().lower() in vacancy.name.lower()]
+
+    @classmethod
     def _get_avg_salary(cls):
         vacancies = cls.all()
         return sum(
