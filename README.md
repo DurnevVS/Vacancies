@@ -1,5 +1,31 @@
 # Работа с вакансиями с hh.ru
 
+0. Для работы команды необходимо иметь запущенный PostgreSQL сервер c 
+   ```python
+    def get_db():
+        return DBPostgreSQL(
+            host=os.getenv('HOST'),
+            dbname=os.getenv('DB_NAME'),
+            user=os.getenv('USER_NAME'),
+            password=os.getenv('PASSWORD')
+        )
+
+
+    def init_db():
+        import models
+        db = get_db()
+
+        for name, obj in inspect.getmembers(models):
+            if inspect.isclass(obj):
+                attrs = {
+                    attr: value for attr, value in obj.__dict__.items() if not attr.startswith('_')
+                }
+                db.create_table(name, **attrs)
+
+        return db
+
+   ```
+
 1. Базово, вся программа состоит из двух классов:
     * Screen
     ```python
