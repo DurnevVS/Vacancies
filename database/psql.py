@@ -13,9 +13,9 @@ class DBPostgreSQL:
         self.__user = user
         self.__password = password
         self.__conninfo = psycopg.conninfo.make_conninfo(
-            host=self.__host, 
-            dbname=self.__dbname, 
-            user=self.__user, 
+            host=self.__host,
+            dbname=self.__dbname,
+            user=self.__user,
             password=self.__password
         )
 
