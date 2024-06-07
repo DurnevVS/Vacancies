@@ -58,8 +58,10 @@ class SearchHHCommand(Command):
             Vacancy.from_dict(vacancy)
             for vacancy in await api.get(int(vacancies_count), text=keyword)
         ]
+
         vacancies.sort()
         Table.show_vacancies(vacancies)
+
         return SearchHHScreen(context={
             'vacancies': vacancies
         })
@@ -72,7 +74,6 @@ class ShowFavoritesVacanciesCommand(Command):
         from screens import FavoritesVacanciesScreen
 
         saved_vacancies = Vacancies.all()
-        print(f'Средняя зарплата по всем избранным вакансиям в рублях = {Vacancies._get_avg_salary()}')
         Table.show_vacancies(saved_vacancies)
 
         return FavoritesVacanciesScreen()

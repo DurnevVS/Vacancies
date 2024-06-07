@@ -8,7 +8,6 @@ load_dotenv()
 init_db()
 
 
-
 async def main():
 
     screen = StartScreen()
