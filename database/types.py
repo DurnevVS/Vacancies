@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import NamedTuple, Any
 
 
@@ -8,18 +9,24 @@ class DataType:
     TEXT = 'text'
 
 
-class NoConstraint(NamedTuple):
+class ConstraintType:
+    pass
+
+
+class NoConstraint(ConstraintType):
     value = ''
 
-class PrimaryKey(NamedTuple):
+
+class PrimaryKey(ConstraintType):
     value = 'PRIMARY KEY'
 
 
-class Unique(NamedTuple):
+class Unique(ConstraintType):
     value = 'UNIQUE'
 
 
-class ForeignKey(NamedTuple):
+@dataclass
+class ForeignKey(ConstraintType):
     parent_model: Any
     parent_column: str
 
@@ -36,5 +43,5 @@ class Constraint:
 
 
 class Column(NamedTuple):
-    type: str
+    type: DataType
     constraint: Constraint = Constraint.NO_CONSTRAINT

@@ -3,8 +3,10 @@ from dotenv import load_dotenv
 from database import init_db
 from screens import StartScreen
 
+
 load_dotenv()
 init_db()
+
 
 
 async def main():

@@ -1,6 +1,6 @@
 from database.types import Column, DataType, Constraint
 from database.model import Model
-from entities import Company, Salary, Vacancy
+from entities import Company, Vacancy
 
 
 class Companies(Model):

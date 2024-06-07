@@ -183,7 +183,6 @@ class Model(DBManager):
             name: column for name, column in cls.__dict__.items() if not name.startswith('_')
         }
         to_delete = {name: value for name, value in obj.__dict__.items() if not name.startswith('_')}
-        print(to_delete)
         # Получение pk у полей с fk
         for name, value in to_delete.items():
             if isinstance(columns[name].constraint, ForeignKey):

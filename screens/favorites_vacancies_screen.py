@@ -28,7 +28,7 @@ class FavoritesVacanciesScreen(Screen):
             ShowVacanciesWithHigherSalaryCommand(
                 'по зарплате',
                 'По зарплате',
-                'Отобразить список вакансий с зрплатой выше средней',
+                'Отобразить список вакансий с зарплатой выше средней',
                 self.context
             ),
             ShowVacanciesByKeywordCommand(
