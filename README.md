@@ -141,26 +141,26 @@
 
     ```python
     class Vacancies(Model):
-    vacancy_id = Column(DataType.SERIAL, Constraint.PK)
-    name = Column(DataType.VARCHAR)
-    company = Column(
-        DataType.INTEGER,
-        Constraint.FK(
-            Companies,
-            'company_id'
-        )
-    )
-    salary_from = Column(DataType.INTEGER)
-    salary_to = Column(DataType.INTEGER)
-    salary_currency = Column(DataType.VARCHAR)
-    area = Column(DataType.VARCHAR)
-    requirement = Column(DataType.TEXT)
-    responsibility = Column(DataType.TEXT)
-    url = Column(DataType.TEXT)
-
-    @classmethod
-    def _get_entity(cls):
-        return Vacancy
+       vacancy_id = Column(DataType.SERIAL, Constraint.PK)
+       name = Column(DataType.VARCHAR)
+       company = Column(
+           DataType.INTEGER,
+           Constraint.FK(
+               Companies,
+               'company_id'
+           )
+       )
+       salary_from = Column(DataType.INTEGER)
+       salary_to = Column(DataType.INTEGER)
+       salary_currency = Column(DataType.VARCHAR)
+       area = Column(DataType.VARCHAR)
+       requirement = Column(DataType.TEXT)
+       responsibility = Column(DataType.TEXT)
+       url = Column(DataType.TEXT)
+   
+       @classmethod
+       def _get_entity(cls):
+           return Vacancy
     ```
 
     Обязательные условия:
