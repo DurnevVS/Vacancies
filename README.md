@@ -30,109 +30,109 @@
     * class Screen
     ```python
     class Screen(ABC):
-    '''
-    Абстрактный класс экрана, от которого должны наследоваться все экраны.
-    Вся программа состоит из набора экранов, 
-    которые соединены между собой через различные команды.
-    Экраны содержат в себе набор команд, доступных на исполнение по вводу пользователя,
-    для исполнения команды у экрана используется метод __call__, 
-    который вызывает метод execute у определенной команды.
-    Все объекты команд должны находиться в property "commands": List[Command].
-    '''
-
-    def __init__(self, context=None):
-        self.context = context or {}
-
-    def __contains__(self, user_input: str) -> bool:
-        for command in self.commands:
-            if user_input == command:
-                return True
-        return False
-
-    def __getitem__(self, user_input: str) -> Command:
-        if user_input in self:
-            for command in self.commands:
-                if user_input == command:
-                    return command
-
-    async def __call__(self, user_input: str) -> 'Screen':
-
-        if user_input in self:
-            return await self[user_input].execute(user_input)
-
-        return self
-
-    def render(self) -> None:
-        print('\nДоступные команды:')
-        for index, command in enumerate(self.commands, 1):
-            print(f'{index}. "{command.name}" - {command.description}')
-        print('Введите команду:')
-
-    @property
-    @abstractmethod
-    def commands(self) -> list[Command]:
-        pass
+       '''
+       Абстрактный класс экрана, от которого должны наследоваться все экраны.
+       Вся программа состоит из набора экранов, 
+       которые соединены между собой через различные команды.
+       Экраны содержат в себе набор команд, доступных на исполнение по вводу пользователя,
+       для исполнения команды у экрана используется метод __call__, 
+       который вызывает метод execute у определенной команды.
+       Все объекты команд должны находиться в property "commands": List[Command].
+       '''
+   
+       def __init__(self, context=None):
+           self.context = context or {}
+   
+       def __contains__(self, user_input: str) -> bool:
+           for command in self.commands:
+               if user_input == command:
+                   return True
+           return False
+   
+       def __getitem__(self, user_input: str) -> Command:
+           if user_input in self:
+               for command in self.commands:
+                   if user_input == command:
+                       return command
+   
+       async def __call__(self, user_input: str) -> 'Screen':
+   
+           if user_input in self:
+               return await self[user_input].execute(user_input)
+   
+           return self
+   
+       def render(self) -> None:
+           print('\nДоступные команды:')
+           for index, command in enumerate(self.commands, 1):
+               print(f'{index}. "{command.name}" - {command.description}')
+           print('Введите команду:')
+   
+       @property
+       @abstractmethod
+       def commands(self) -> list[Command]:
+           pass
     ```
 
     * class Command
     ```python
     class Command(ABC):
-    '''
-    Абстрактный класс команды, от которого должны наследоваться все команды.
-    Каждая команда содержит следующие свойства:
-    alias - строка, по которой сравнивается ввод пользователя на соотвествие команде
-    name - название команды для отображения в консоле
-    description - описание команды для отображения в консоле
-    context - дополнительная информация, которую требуется передавать от экрана к экрану
-    '''
-
-    def __init__(
-            self,
-            alias: str,
-            name: str,
-            description: str,
-            context: dict
-    ):
-        self.alias = alias
-        self.name = name
-        self.description = description
-        self.context = context
-
-    def __eq__(self, user_input: str) -> bool:
-        return re.fullmatch(self.alias, user_input)
-
-    @abstractmethod
-    async def execute(self, user_input: str) -> 'Screen':
-        '''
-        Выполнение кастомных действий и перевод на другой экран.
-        Внутри функции должны импортироваться экраны, на которые будет переводить команда,
-        чтобы избежать цикличного импорта
-        '''
-        pass
+       '''
+       Абстрактный класс команды, от которого должны наследоваться все команды.
+       Каждая команда содержит следующие свойства:
+       alias - строка, по которой сравнивается ввод пользователя на соотвествие команде
+       name - название команды для отображения в консоле
+       description - описание команды для отображения в консоле
+       context - дополнительная информация, которую требуется передавать от экрана к экрану
+       '''
+   
+       def __init__(
+               self,
+               alias: str,
+               name: str,
+               description: str,
+               context: dict
+       ):
+           self.alias = alias
+           self.name = name
+           self.description = description
+           self.context = context
+   
+       def __eq__(self, user_input: str) -> bool:
+           return re.fullmatch(self.alias, user_input)
+   
+       @abstractmethod
+       async def execute(self, user_input: str) -> 'Screen':
+           '''
+           Выполнение кастомных действий и перевод на другой экран.
+           Внутри функции должны импортироваться экраны, на которые будет переводить команда,
+           чтобы избежать цикличного импорта
+           '''
+           pass
     ```
 
 2. Для работы с апи используется абстрактный класс API, методом фабрики можно получать конкретную реализацию АПИ, например для работы с hh.ru
     
     ```python
     class API(AbstractAPI):
-    '''
-    Базовый класс АПИ, реализущий интерфейс работы с каким-то конкретным АПИ,
-    по необходимости можно создать не только под HH.ru и другие сервисы поиска вакансий, 
-    но и на такие как получение курса валют, и т.д.
-    
-    Для удобного доступа и тайп хинтинга в основном коде программы, рекомендуется реализовать classmethod
-    с полученим экземпляра конкретного АПИ
-    '''
-
-    def __init__(self, api: AbstractAPI):
-        self.api = api
-
-    def get(self, *args, **kwargs) -> Any:
-        return self.api.get(*args, **kwargs)
-
-    @classmethod
-    def HH_API(cls) -> HHAPI:
-        return cls(HHAPI())
+       '''
+       Базовый класс АПИ, реализущий интерфейс работы с каким-то конкретным АПИ,
+       по необходимости можно создать не только под HH.ru и другие сервисы поиска вакансий, 
+       но и на такие как получение курса валют, и т.д.
+       
+       Для удобного доступа и тайп хинтинга в основном коде программы, рекомендуется реализовать classmethod
+       с полученим экземпляра конкретного АПИ
+       '''
+   
+       def __init__(self, api: AbstractAPI):
+           self.api = api
+   
+       def get(self, *args, **kwargs) -> Any:
+           return self.api.get(*args, **kwargs)
+   
+       @classmethod
+       def HH_API(cls) -> HHAPI:
+           return cls(HHAPI())
 
 3. Для хранения данных в бд используется библиотека psycopg3, все чтения / записи идут через базовый класс Model:
    
