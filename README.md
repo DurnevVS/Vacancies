@@ -138,7 +138,17 @@
    
     Базовый класс для всех моделей, служит, чтобы описать структуру таблицы
     и получать данные из базы данных
-   
+
+    ```python
+    class Companies(Model):
+        company_id = Column(DataType.SERIAL, Constraint.PK)
+        name = Column(DataType.VARCHAR)
+        url = Column(DataType.VARCHAR)
+
+    @classmethod
+    def _get_entity(cls):
+        return Company
+    ```
 
     Обязательные условия:
     1. Модель необходимо свзать с сущностью, к которой она относится через переопределение _get_entity
