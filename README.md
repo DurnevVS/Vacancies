@@ -1,7 +1,29 @@
 # Работа с вакансиями с hh.ru
 
-0. Для работы программы необходимо иметь запущенный PostgreSQL сервер
-   ```python
+0. Для работы программы необходимо иметь запущенный PostgreSQL сервер и соотвествующие переменные окружения
+    ```python
+    load_dotenv()
+    init_db()
+
+
+    async def main():
+
+        screen = StartScreen()
+        screen.render()
+        while True:
+            user_input = input().strip().lower()
+
+            if user_input in screen:
+                screen = await screen(user_input)
+                screen.render()
+            else:
+                print('Такой команды нет')
+
+    if __name__ == "__main__":
+        asyncio.run(main())
+    ```
+
+    ```python
     def get_db():
         return DBPostgreSQL(
             host=os.getenv('HOST'),
@@ -183,9 +205,9 @@
 
         * исполнениe кастомного sql запроса через cls._db.execute(query) -> list[TupleRow]
   
-5. Для вывода информации на экран: библиотека Rich
+4. Для вывода информации на экран: библиотека Rich
    ![alt text](image.png)
 
-6. Работая в программе нужно вводить команды - слово, которое написано (регистр не учитывается),
+5. Работая в программе нужно вводить команды - слово, которое написано (регистр не учитывается),
     либо вводить ЦИФРУ, если написано "Введите номер ..."
     ![alt text](image-1.png)
