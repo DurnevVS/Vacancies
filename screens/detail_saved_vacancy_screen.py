@@ -2,7 +2,6 @@ from screens.screen import Screen, Command
 from models import Vacancies
 
 from table import Table
-import table
 
 
 class DetailSavedVacancyScreen(Screen):

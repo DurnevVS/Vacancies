@@ -4,11 +4,6 @@ import inspect
 
 from .types import Column
 
-import psycopg.conninfo
-from dotenv import load_dotenv
-
-load_dotenv()
-
 
 class DBPostgreSQL:
 
