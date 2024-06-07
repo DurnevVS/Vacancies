@@ -140,14 +140,27 @@
     и получать данные из базы данных
 
     ```python
-    class Companies(Model):
-        company_id = Column(DataType.SERIAL, Constraint.PK)
-        name = Column(DataType.VARCHAR)
-        url = Column(DataType.VARCHAR)
+    class Vacancies(Model):
+    vacancy_id = Column(DataType.SERIAL, Constraint.PK)
+    name = Column(DataType.VARCHAR)
+    company = Column(
+        DataType.INTEGER,
+        Constraint.FK(
+            Companies,
+            'company_id'
+        )
+    )
+    salary_from = Column(DataType.INTEGER)
+    salary_to = Column(DataType.INTEGER)
+    salary_currency = Column(DataType.VARCHAR)
+    area = Column(DataType.VARCHAR)
+    requirement = Column(DataType.TEXT)
+    responsibility = Column(DataType.TEXT)
+    url = Column(DataType.VARCHAR)
 
     @classmethod
     def _get_entity(cls):
-        return Company
+        return Vacancy
     ```
 
     Обязательные условия:
