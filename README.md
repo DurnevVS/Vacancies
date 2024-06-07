@@ -156,7 +156,7 @@
     area = Column(DataType.VARCHAR)
     requirement = Column(DataType.TEXT)
     responsibility = Column(DataType.TEXT)
-    url = Column(DataType.VARCHAR)
+    url = Column(DataType.TEXT)
 
     @classmethod
     def _get_entity(cls):
