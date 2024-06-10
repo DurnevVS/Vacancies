@@ -14,8 +14,6 @@ class Table(RichTable):
 
     @classmethod
     def show_vacancies(cls, vacancies):
-        avg = sum(vacancy._salary.avg_salary for vacancy in vacancies) / len(vacancies)
-
         table = cls()
         table.add_column('Номер')
         table.add_column('Название')
@@ -33,7 +31,9 @@ class Table(RichTable):
             for index, vacancy in enumerate(vacancies, 1)
         ]
         table.console.print(table)
-        print(f'Средняя зарплата: {avg} ₽')
+        if vacancies:
+            avg = sum(vacancy._salary.avg_salary for vacancy in vacancies) / len(vacancies)
+            print(f'Средняя зарплата: {avg} ₽')
 
     @classmethod
     def show_companies_and_vacancies_count(cls, companies):

@@ -113,7 +113,8 @@ def init_db():
     for name, obj in inspect.getmembers(models):
         if inspect.isclass(obj):
             attrs = {
-                attr: value for attr, value in obj.__dict__.items() if not attr.startswith('_')
+                attr: value for attr, value in vars(obj).items()
+                if isinstance(value, Column)
             }
             db.create_table(name, **attrs)
 

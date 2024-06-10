@@ -8,9 +8,7 @@ class Companies(Model):
     name = Column(DataType.VARCHAR)
     url = Column(DataType.VARCHAR)
 
-    @classmethod
-    def _get_entity(cls):
-        return Company
+    entity = Company
 
 
 class Vacancies(Model):
@@ -31,34 +29,34 @@ class Vacancies(Model):
     responsibility = Column(DataType.TEXT)
     url = Column(DataType.TEXT)
 
-    @classmethod
-    def _get_entity(cls):
-        return Vacancy
+    entity = Vacancy
 
     @classmethod
-    def _get_companies_and_vacancies_count(cls):
+    def get_companies_and_vacancies_count(cls):
         return {
             company: len(cls.filter(company=company)) for company in Companies.all()
         }
 
     @classmethod
-    def _get_vacancies_with_keyword(cls, keyword):
+    def get_vacancies_with_keyword(cls, keyword):
         vacancies = cls.all()
         return [vacancy for vacancy in vacancies if keyword.strip().lower() in vacancy.name.lower()]
 
     @classmethod
-    def _get_avg_salary(cls):
+    def get_avg_salary(cls):
         vacancies = cls.all()
         return sum(
             vacancy._salary.avg_salary for vacancy in vacancies
         ) / len(vacancies)
 
     @classmethod
-    def _get_vacancies_with_higher_salary(cls):
-        avg = cls._get_avg_salary()
+    def get_vacancies_with_higher_salary(cls):
         vacancies = cls.all()
         vacancies_with_higher_salary = []
-        for vacancy in vacancies:
-            if vacancy._salary.avg_salary >= avg:
-                vacancies_with_higher_salary.append(vacancy)
+        if vacancies:
+            avg = cls.get_avg_salary()
+            for vacancy in vacancies:
+                if vacancy._salary.avg_salary >= avg:
+                    vacancies_with_higher_salary.append(vacancy)
+
         return vacancies_with_higher_salary

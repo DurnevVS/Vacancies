@@ -5,48 +5,44 @@ from .types import Column, ForeignKey
 from .raises import WrongFieldError
 
 
-class DBManager(ABC):
-    pass
-
-
-class Model(DBManager):
+class Model(ABC):
     '''
     Базовый класс для всех моделей, служит, чтобы описать структуру таблицы
-    и получать данные из базы данных
-    #TODO(Добавить функционал дляя UPDATE т.к. в рамках задачи он пока не нужен)
+    и работать с БД на уровне объектов
+    #TODO(Добавить функционал для UPDATE т.к. в рамках задачи он пока не нужен)
     #TODO(Не плохо бы отрефакторить этот класс - много DRY кода)
 
     Обязательные условия:
-    1. Модель необходимо свзать с сущностью, к которой она относится через переопределение _get_entity
+    1. Модель необходимо свзать с сущностью, к которой она относится через переопределение entity = Any
     2. Первым полем в моделе обязательно должен идти pk name_id, т.к. объекты строются с использованием срезов
     из туплов [1:], исключая id из этого списка
     #TODO(Сделать поле name_id необязательным, чтобы в качестве pk можно было использовать любое поле)
     3. Имена полей в сущностях должны совпадать с именами полей модели, т.к. они используются для соотношения
     полей в сущностях и полей в моделях
     4. Функцонал моделей можно расширять,
-    используя classmethod _func_name(cls) (!Нижний регистр в начале имени обязателен!) через:
+    используя classmethod func_name(cls) через:
 
         * использование высокоуровневых функций через cls.:
             save, all, get, filter, delete, clear
 
         * использование низкоуровневых функций через cls._db.:
-            get_all, get_row, get_rows, add_row, delete_row, delete_all
+            add_row, get_all, get_row, get_rows, delete_row, delete_all
 
         * исполнениe кастомного sql запроса через cls._db.execute(query) -> list[TupleRow]
 
     '''
     _db = get_db()
 
-    @classmethod
+    @property
     @abstractmethod
-    def _get_entity(cls) -> Any: pass
+    def entity(cls) -> Any: pass
 
     @classmethod
     def save(cls, obj: Any):
         columns: dict[str, Column] = {
-            name: column for name, column in cls.__dict__.items() if not name.startswith('_')
+            name: column for name, column in vars(cls).items() if isinstance(column, Column)
         }
-        obj_attrs = {key: value for key, value in obj.__dict__.items() if not key.startswith('_')}
+        obj_attrs = {key: value for key, value in vars(obj).items() if not key.startswith('_')}
 
         for name, column in columns.items():
             if isinstance(column.constraint, ForeignKey):
@@ -62,7 +58,7 @@ class Model(DBManager):
     @classmethod
     def all(cls):
         columns: list[str] = {
-            name: column for name, column in cls.__dict__.items() if not name.startswith('_')
+            name: column for name, column in vars(cls).items() if isinstance(column, Column)
         }
         rows = cls._db.get_all(cls.__name__)
 
@@ -76,17 +72,17 @@ class Model(DBManager):
                     one[name] = parent_model._db.get_row(
                         parent_model.__name__, **{column.constraint.parent_column: one[name]}
                     )
-                    parent_entity = parent_model._get_entity()
+                    parent_entity = parent_model.entity
                     one[name] = parent_entity(*one[name][1:])
 
-        entity = cls._get_entity()
+        entity = cls.entity
         all_: list[Any] = [entity(*list(one.values())[1:]) for one in all_]
         return all_
 
     @classmethod
     def get(cls, **kwargs):
         columns: dict[str, Column] = {
-            name: column for name, column in cls.__dict__.items() if not name.startswith('_')
+            name: column for name, column in vars(cls).items() if isinstance(column, Column)
         }
         # проверка на соотвествие заданному параметру в списке параметров
         for name in kwargs.keys():
@@ -98,7 +94,7 @@ class Model(DBManager):
                 parent_model: Model = columns[name].constraint.parent_model
                 row = parent_model._db.get_row(
                     parent_model.__name__,
-                    **{name: value for name, value in value.__dict__.items()},
+                    **{name: value for name, value in vars(value).items()},
                 )
                 if not row:
                     return None
@@ -120,17 +116,17 @@ class Model(DBManager):
                     **{value.constraint.parent_column: temp[name]},
                 )
 
-                parent_entity = parent_model._get_entity()
+                parent_entity = parent_model.entity
                 temp[name] = parent_entity(*row[1:])
 
-        entity = cls._get_entity()
+        entity = cls.entity
 
         return entity(*list(temp.values())[1:])
 
     @classmethod
     def filter(cls, **kwargs):
         columns: dict[str, Column] = {
-            name: column for name, column in cls.__dict__.items() if not name.startswith('_')
+            name: column for name, column in vars(cls).items() if isinstance(column, Column)
         }
         # проверка на соотвествие заданному параметру в списке параметров
         for name in kwargs.keys():
@@ -144,7 +140,7 @@ class Model(DBManager):
                 parent_model: Model = columns[name].constraint.parent_model
                 row = parent_model._db.get_row(
                     parent_model.__name__,
-                    **{name: value for name, value in value.__dict__.items()},
+                    **{name: value for name, value in vars(value).items()},
                 )
                 if not row:
                     return []
@@ -169,10 +165,10 @@ class Model(DBManager):
                         **{value.constraint.parent_column: temp[name]},
                     )
 
-                    parent_entity = parent_model._get_entity()
+                    parent_entity = parent_model.entity
                     temp[name] = parent_entity(*row[1:])
 
-            entity = cls._get_entity()
+            entity = cls.entity
             entities.append(entity(*list(temp.values())[1:]))
 
         return entities
@@ -180,16 +176,16 @@ class Model(DBManager):
     @classmethod
     def delete(cls, obj):
         columns: dict[str, Column] = {
-            name: column for name, column in cls.__dict__.items() if not name.startswith('_')
+            name: column for name, column in vars(cls).items() if isinstance(column, Column)
         }
-        to_delete = {name: value for name, value in obj.__dict__.items() if not name.startswith('_')}
+        to_delete = {name: value for name, value in vars(obj).items() if not name.startswith('_')}
         # Получение pk у полей с fk
         for name, value in to_delete.items():
             if isinstance(columns[name].constraint, ForeignKey):
                 parent_model: Model = columns[name].constraint.parent_model
                 row = parent_model._db.get_row(
                     parent_model.__name__,
-                    **{name: value for name, value in value.__dict__.items()},
+                    **{name: value for name, value in vars(value).items()},
                 )
                 if not row:
                     return None

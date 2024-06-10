@@ -76,14 +76,14 @@ class ShowVacancyCommand(Command):
 class ShowAllCompaniesAndVacanciesCountCommand(Command):
 
     async def execute(self, user_input: str) -> Screen:
-        Table.show_companies_and_vacancies_count(Vacancies._get_companies_and_vacancies_count())
+        Table.show_companies_and_vacancies_count(Vacancies.get_companies_and_vacancies_count())
         return FavoritesVacanciesScreen()
 
 
 class ShowVacanciesWithHigherSalaryCommand(Command):
 
     async def execute(self, user_input: str) -> Screen:
-        Table.show_vacancies(Vacancies._get_vacancies_with_higher_salary())
+        Table.show_vacancies(Vacancies.get_vacancies_with_higher_salary())
         return FavoritesVacanciesScreen()
 
 
@@ -91,5 +91,5 @@ class ShowVacanciesByKeywordCommand(Command):
 
     async def execute(self, user_input: str) -> Screen:
         user_input = input('Введите ключевое слово для поиска: ')
-        Table.show_vacancies(Vacancies._get_vacancies_with_keyword(user_input))
+        Table.show_vacancies(Vacancies.get_vacancies_with_keyword(user_input))
         return FavoritesVacanciesScreen()
