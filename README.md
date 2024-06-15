@@ -34,17 +34,18 @@
 
 
     def init_db():
-        import models
-        db = get_db()
+    import models
+    db = get_db()
 
-        for name, obj in inspect.getmembers(models):
-            if inspect.isclass(obj):
-                attrs = {
-                    attr: value for attr, value in obj.__dict__.items() if not attr.startswith('_')
-                }
-                db.create_table(name, **attrs)
+    for name, obj in inspect.getmembers(models):
+        if inspect.isclass(obj):
+            attrs = {
+                attr: value for attr, value in vars(obj).items()
+                if isinstance(value, Column)
+            }
+            db.create_table(name, **attrs)
 
-        return db
+    return db
 
    ```
 
@@ -180,13 +181,11 @@
        responsibility = Column(DataType.TEXT)
        url = Column(DataType.TEXT)
    
-       @classmethod
-       def _get_entity(cls):
-           return Vacancy
+       entity = Vacancy
     ```
 
     Обязательные условия:
-    1. Модель необходимо свзать с сущностью, к которой она относится через переопределение _get_entity
+    1. Модель необходимо свзать с сущностью, к которой она относится через переопределение поля entity
 
     2. Первым полем в моделе обязательно должен идти pk name_id, т.к. объекты строются с использованием срезов
     из туплов [1:], исключая id из этого списка
@@ -195,7 +194,7 @@
     полей в сущностях и полей в моделях
 
     4. Функцонал моделей можно расширять,
-    используя classmethod _func_name(cls) (!Нижний регистр в начале имени обязателен!) через:
+    используя classmethod func_name(cls) через:
 
         * использование высокоуровневых функций через cls.:
             save, all, get, filter, delete, clear
